@@ -105,3 +105,13 @@ class Model:
         Restituisce i prezzi dei primi 7 giorni del mese selezionato per ciascun distributore.
         :return: un dizionario: {id_distributore: [prezzo_giorno1, ..., prezzo_giorno7]}
         """
+        prezzi_settimana = {}
+        for distributore in self._distributori:
+            prezzi = distributore.get_prezzi()
+            # Filtriamo i primi 7 giorni del mese scelto e ordiniamo cronologicamente
+            prezzi_filtrati = [p for p in prezzi if p.data.month == mese and 1 <= p.data.day <= 7]
+            prezzi_filtrati.sort(key=lambda p: p.data)
+
+            prezzi_settimana[distributore.id] = [p.prezzo_litro for p in prezzi_filtrati]
+
+        return prezzi_settimana
