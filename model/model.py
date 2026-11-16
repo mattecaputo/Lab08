@@ -59,6 +59,46 @@ class Model:
     def __ricorsione(self, sequenza_parziale, giorno, ultimo_distributore, costo_corrente, prezzi_settimana):
         """ Implementa la ricorsione """
 
+        # Se abbiamo pianificato tutti e 7 i giorni, controlliamo se il costo è il migliore trovato finora
+        if len(sequenza_parziale) == 7:
+            if self.__costo_ottimo == -1 or costo_corrente < self.__costo_ottimo:
+                self.__costo_ottimo = costo_corrente  # IMPORTANTE: fare una copia della lista, altrimenti le modifiche successive tramite pop() sovrascriveranno anche la sequenza ottima salvata.
+                self.__sequenza_ottima = list(sequenza_parziale)
+                return
+
+        # Se il costo parziale ha già superato il costo ottimo attuale,
+        # è inutile continuare a esplorare questo ramo.
+        if self.__costo_ottimo != -1 and costo_corrente >= self.__costo_ottimo:
+            return
+
+
+        for distributore in self._distributori:
+            id_dist = distributore.id
+
+            # L'indice della lista dei prezzi è giorno - 1 (perché il giorno parte da 1, ma gli indici da 0)
+            prezzo_litro = prezzi_settimana[id_dist][giorno - 1]
+
+            # Calcolo del costo per questa specifica giornata: 100 litri * prezzo
+            costo_giornaliero = float(prezzo_litro) * 100
+
+            # Aggiungiamo il costo fisso di 5€ se cambiamo distributore
+            if ultimo_distributore is not None and ultimo_distributore != id_dist:
+                costo_giornaliero += 5
+
+            # Applichiamo la scelta temporanea (Compute Partial)
+            sequenza_parziale.append(id_dist)
+
+            # Scendiamo di livello nella ricorsione per il giorno successivo
+            self.__ricorsione(sequenza_parziale,
+                              giorno + 1,
+                              id_dist,
+                              costo_corrente + costo_giornaliero,
+                              prezzi_settimana)
+
+            # Finito di esplorare le conseguenze della scelta di 'id_dist',
+            # rimuoviamo l'ultimo elemento per permettere al ciclo for di provare l'altro distributore.
+            sequenza_parziale.pop()
+
 
     def __get_prezzi_prima_settimana_mese(self, mese: int):
         """
