@@ -25,7 +25,19 @@ class Model:
         :param mese: Mese selezionato (un intero da 1 a 12)
         :return: lista di tuple --> (nome del distributore, media), es. (Distributore A, 1.789)
         """
-        # TODO
+
+        risultato = []
+        for distributore in self._distributori:
+            prezzi = distributore.get_prezzi()
+            prezzi_mese = [p.prezzo_litro for p in prezzi if p.data.month == mese]
+
+            if len(prezzi_mese) > 0:
+                media = sum(prezzi_mese) / len(prezzi_mese)
+                risultato.append((distributore.nome, round(media, 3)))
+            else:
+                risultato.append((distributore.nome, 0.0))
+
+        return risultato
 
     def get_sequenza_ottima(self, mese:int):
         """
@@ -46,11 +58,10 @@ class Model:
 
     def __ricorsione(self, sequenza_parziale, giorno, ultimo_distributore, costo_corrente, prezzi_settimana):
         """ Implementa la ricorsione """
-        # TODO
+
 
     def __get_prezzi_prima_settimana_mese(self, mese: int):
         """
         Restituisce i prezzi dei primi 7 giorni del mese selezionato per ciascun distributore.
         :return: un dizionario: {id_distributore: [prezzo_giorno1, ..., prezzo_giorno7]}
         """
-        # TODO
